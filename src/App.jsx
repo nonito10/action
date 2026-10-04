@@ -1,94 +1,59 @@
-import { useEffect, useState } from "react";
-
-const STORAGE_KEY = "action.items";
-const FILTERS = ["all", "open", "done"];
-
-function loadItems() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
-  } catch {
-    return [];
-  }
-}
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import CitizenLayout from "./components/citizen/Layout";
+import AdminLayout from "./components/admin/Layout";
+import Dashboard from "./pages/citizen/Dashboard";
+import ReportPage from "./pages/citizen/Report";
+import MyReports from "./pages/citizen/MyReports";
+import ClimateHub from "./pages/citizen/ClimateHub";
+import Community from "./pages/citizen/Community";
+import MapPage from "./pages/citizen/MapPage";
+import Quiz from "./pages/citizen/Quiz";
+import Notifications from "./pages/citizen/Notifications";
+import Profile from "./pages/citizen/Profile";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminReports from "./pages/admin/Reports";
+import AdminUsers from "./pages/admin/Users";
+import AdminClimateHub from "./pages/admin/ClimateHub";
+import AdminNews from "./pages/admin/News";
+import AdminAdvisories from "./pages/admin/Advisories";
+import AdminActivities from "./pages/admin/Activities";
+import AdminCommunity from "./pages/admin/Community";
+import AdminQuiz from "./pages/admin/Quiz";
+import AdminMap from "./pages/admin/MapPage";
+import AdminAnalytics from "./pages/admin/Analytics";
+import AdminSettings from "./pages/admin/Settings";
 
 export default function App() {
-  const [items, setItems] = useState(loadItems);
-  const [text, setText] = useState("");
-  const [filter, setFilter] = useState("all");
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
-
-  const addItem = (e) => {
-    e.preventDefault();
-    const title = text.trim();
-    if (!title) return;
-    setItems([{ id: crypto.randomUUID(), title, done: false }, ...items]);
-    setText("");
-  };
-
-  const toggle = (id) =>
-    setItems(items.map((i) => (i.id === id ? { ...i, done: !i.done } : i)));
-
-  const remove = (id) => setItems(items.filter((i) => i.id !== id));
-
-  const visible = items.filter(
-    (i) => filter === "all" || (filter === "done") === i.done
-  );
-  const openCount = items.filter((i) => !i.done).length;
-
   return (
-    <main className="app">
-      <h1>Action</h1>
-      <p className="subtitle">
-        {openCount} open · {items.length - openCount} done
-      </p>
-
-      <form className="add" onSubmit={addItem}>
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="What needs to happen?"
-          aria-label="New action item"
-        />
-        <button type="submit">Add</button>
-      </form>
-
-      <nav className="filters">
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            className={f === filter ? "active" : ""}
-            onClick={() => setFilter(f)}
-          >
-            {f}
-          </button>
-        ))}
-      </nav>
-
-      <ul className="list">
-        {visible.map((item) => (
-          <li key={item.id} className={item.done ? "done" : ""}>
-            <label>
-              <input
-                type="checkbox"
-                checked={item.done}
-                onChange={() => toggle(item.id)}
-              />
-              <span>{item.title}</span>
-            </label>
-            <button
-              className="remove"
-              onClick={() => remove(item.id)}
-              aria-label={`Delete ${item.title}`}
-            >
-              ×
-            </button>
-          </li>
-        ))}
-        {visible.length === 0 && <li className="empty">Nothing here yet.</li>}
-      </ul>
-    </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<CitizenLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="report" element={<ReportPage />} />
+          <Route path="my-reports" element={<MyReports />} />
+          <Route path="climate-hub" element={<ClimateHub />} />
+          <Route path="community" element={<Community />} />
+          <Route path="map" element={<MapPage />} />
+          <Route path="quiz" element={<Quiz />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="reports" element={<AdminReports />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="climate-hub" element={<AdminClimateHub />} />
+          <Route path="news" element={<AdminNews />} />
+          <Route path="advisories" element={<AdminAdvisories />} />
+          <Route path="activities" element={<AdminActivities />} />
+          <Route path="community" element={<AdminCommunity />} />
+          <Route path="quiz" element={<AdminQuiz />} />
+          <Route path="map" element={<AdminMap />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
